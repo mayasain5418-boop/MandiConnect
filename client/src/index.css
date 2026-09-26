@@ -2,18 +2,19 @@
 
 @layer base {
   :root {
-    --bg-mandi: #FBF8F1;
-    --bg-mandi-alt: #F4EEDD;
-    --green-dark: #163326;
-    --green-primary: #1F4D36;
-    --green-light: #2E6B4D;
-    --green-soft: #E4EEE7;
-    --accent-gold: #D9760C;
-    --accent-gold-dark: #B25F06;
-    --accent-soft: #FBE7CC;
-    --text-primary: #1F2923;
-    --text-muted: #5C6A61;
-    --border-color: #E2DAC8;
+    --bg-mandi: #F8FAF7;
+    --bg-mandi-alt: #F0F4EE;
+    --green-dark: #0D2818;
+    --green-primary: #164E33;
+    --green-light: #248A68;
+    --green-soft: #E8F5E9;
+    --accent-gold: #E67E22;
+    --accent-gold-dark: #C0392B;
+    --accent-soft: #FEF3C7;
+    --text-primary: #1E293B;
+    --text-muted: #64748B;
+    --border-color: #E2E8F0;
+    --shadow-soft: 0 10px 30px -5px rgba(22, 78, 51, 0.08);
   }
 
   body {
@@ -23,45 +24,113 @@
     margin: 0;
     padding: 0;
     overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
   }
 }
 
-/* Custom Utilities */
-.glass-panel {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(226, 218, 200, 0.6);
+/* Custom Utilities & Highlights */
+.mandi-glass {
+  background: rgba(255, 255, 255, 0.90);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.mandi-glass-dark {
+  background: rgba(13, 40, 24, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .mandi-gradient {
-  background: linear-gradient(135deg, #163326 0%, #1F4D36 60%, #2E6B4D 100%);
+  background: linear-gradient(135deg, #0D2818 0%, #164E33 50%, #248A68 100%);
 }
 
 .mandi-accent-gradient {
-  background: linear-gradient(135deg, #D9760C 0%, #B25F06 100%);
+  background: linear-gradient(135deg, #E67E22 0%, #D35400 100%);
 }
 
-.mandi-hero-bg {
-  background-color: #163326;
-  background-image: radial-gradient(#2E6B4D 0.75px, transparent 0.75px), radial-gradient(#2E6B4D 0.75px, #163326 0.75px);
-  background-size: 30px 30px;
-  background-position: 0 0, 15px 15px;
+.mandi-hero-pattern {
+  background-color: #0D2818;
+  background-image: 
+    radial-gradient(circle at 50% 50%, rgba(36, 138, 104, 0.15) 0%, transparent 60%),
+    radial-gradient(#164E33 0.75px, transparent 0.75px), 
+    radial-gradient(#164E33 0.75px, #0D2818 0.75px);
+  background-size: 100% 100%, 28px 28px, 28px 28px;
+  background-position: center, 0 0, 14px 14px;
 }
 
-/* Skeleton loader */
+.card-hover-elevation {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease;
+}
+
+.card-hover-elevation:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 35px -10px rgba(13, 40, 24, 0.12);
+  border-color: #248A68;
+}
+
+/* Signature Mandi Rate Ticker Marquee */
+.ticker-container {
+  background: linear-gradient(90deg, #0D2818 0%, #164E33 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  position: relative;
+}
+
+.ticker-container::before,
+.ticker-container::after {
+  content: "";
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 48px;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.ticker-container::before {
+  left: 0;
+  background: linear-gradient(90deg, #0D2818, transparent);
+}
+
+.ticker-container::after {
+  right: 0;
+  background: linear-gradient(270deg, #164E33, transparent);
+}
+
+.ticker-track {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  padding: 8px 0;
+  white-space: nowrap;
+  animation: ticker-marquee 35s linear infinite;
+  will-change: transform;
+}
+
+.ticker-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes ticker-marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* Skeleton Shimmer */
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
 
 .skeleton {
-  background: linear-gradient(90deg, #E4EEE7 25%, #F4EEDD 50%, #E4EEE7 75%);
+  background: linear-gradient(90deg, #E8F5E9 25%, #F0F4EE 50%, #E8F5E9 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }
 
-/* Hide scrollbar for category horizontal scroll */
+/* Hide scrollbar */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }

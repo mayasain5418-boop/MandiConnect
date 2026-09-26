@@ -1,50 +1,50 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Leaf, Phone, Mail, MapPin, ShieldCheck, Truck, RefreshCw, Award } from 'lucide-react';
+import { Leaf, Phone, Mail, MapPin, ShieldCheck, Truck, Award } from 'lucide-react';
 
 export default function Footer() {
     return (
-        <footer className="bg-[#163326] text-gray-300 pt-16 pb-8 border-t-4 border-[#D9760C]">
+        <footer className="bg-[#0D2818] text-gray-300 pt-16 pb-8 border-t-4 border-[#E67E22]">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Features Value Props */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pb-12 border-b border-emerald-900/60">
                     <div className="flex items-center gap-3.5">
-                        <div className="w-10 h-10 rounded-xl bg-emerald-900/80 flex items-center justify-center text-emerald-400 shrink-0">
+                        <div className="w-10 h-10 rounded-xl bg-emerald-950 flex items-center justify-center text-emerald-400 shrink-0 border border-emerald-800">
                             <Leaf className="w-5 h-5" />
                         </div>
                         <div>
-                            <h4 className="text-sm font-bold text-white mb-0.5">Farm Fresh Daily</h4>
-                            <p className="text-xs text-gray-400">Directly sourced from regional mandis</p>
+                            <h4 className="text-sm font-bold text-white mb-0.5">Direct Farm Harvest</h4>
+                            <p className="text-xs text-emerald-200/70">Direct APMC Mandi lots</p>
                         </div>
                     </div>
 
                     <div className="flex items-center gap-3.5">
-                        <div className="w-10 h-10 rounded-xl bg-emerald-900/80 flex items-center justify-center text-amber-400 shrink-0">
+                        <div className="w-10 h-10 rounded-xl bg-emerald-950 flex items-center justify-center text-amber-400 shrink-0 border border-emerald-800">
                             <Truck className="w-5 h-5" />
                         </div>
                         <div>
-                            <h4 className="text-sm font-bold text-white mb-0.5">Speedy Delivery</h4>
-                            <p className="text-xs text-gray-400">Hassle-free doorstep shipping</p>
+                            <h4 className="text-sm font-bold text-white mb-0.5">District Logistics</h4>
+                            <p className="text-xs text-emerald-200/70">Pincode zone shipping</p>
                         </div>
                     </div>
 
                     <div className="flex items-center gap-3.5">
-                        <div className="w-10 h-10 rounded-xl bg-emerald-900/80 flex items-center justify-center text-emerald-400 shrink-0">
+                        <div className="w-10 h-10 rounded-xl bg-emerald-950 flex items-center justify-center text-emerald-400 shrink-0 border border-emerald-800">
                             <Award className="w-5 h-5" />
                         </div>
                         <div>
-                            <h4 className="text-sm font-bold text-white mb-0.5">Best Mandi Prices</h4>
-                            <p className="text-xs text-gray-400">No middlemen price markups</p>
+                            <h4 className="text-sm font-bold text-white mb-0.5">Authentic APMC Rates</h4>
+                            <p className="text-xs text-emerald-200/70">0% middleman markups</p>
                         </div>
                     </div>
 
                     <div className="flex items-center gap-3.5">
-                        <div className="w-10 h-10 rounded-xl bg-emerald-900/80 flex items-center justify-center text-emerald-400 shrink-0">
+                        <div className="w-10 h-10 rounded-xl bg-emerald-950 flex items-center justify-center text-emerald-400 shrink-0 border border-emerald-800">
                             <ShieldCheck className="w-5 h-5" />
                         </div>
                         <div>
-                            <h4 className="text-sm font-bold text-white mb-0.5">100% Guaranteed</h4>
-                            <p className="text-xs text-gray-400">Verified buyer reviews & easy refunds</p>
+                            <h4 className="text-sm font-bold text-white mb-0.5">GST Invoiced</h4>
+                            <p className="text-xs text-emerald-200/70">Automated Tax PDFs & credit notes</p>
                         </div>
                     </div>
                 </div>
@@ -54,17 +54,17 @@ export default function Footer() {
                     {/* Brand Info */}
                     <div className="md:col-span-2 space-y-4">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center text-white font-bold">
-                                <Leaf className="w-5 h-5" />
+                            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#164E33] to-[#248A68] flex items-center justify-center text-white font-bold shadow-md">
+                                <Leaf className="w-5 h-5 text-emerald-300" />
                             </div>
-                            <span className="text-2xl font-bold tracking-tight text-white font-serif">
-                                Mandi<span className="text-[#D9760C]">Connect</span>
+                            <span className="text-2xl font-black tracking-tight text-white font-serif">
+                                Mandi<span className="text-[#E67E22]">Connect</span>
                             </span>
                         </div>
-                        <p className="text-xs text-gray-400 leading-relaxed max-w-sm">
-                            Mandi Connect is India's leading digital produce marketplace connecting local agricultural mandis directly to households. Fresh fruits, vegetables, grains, and groceries delivered with full transparency.
+                        <p className="text-xs text-emerald-100/70 leading-relaxed max-w-sm">
+                            MandiConnect is an enterprise B2B Wholesale Marketplace connecting agricultural APMC Mandis directly with commercial buyers, hotels, caterers, and retailers with complete transparency.
                         </p>
-                        <div className="pt-2 flex items-center gap-4 text-xs font-semibold text-emerald-400">
+                        <div className="pt-2 flex flex-wrap items-center gap-4 text-xs font-bold text-emerald-300">
                             <span className="flex items-center gap-1.5"><Phone className="w-3.5 h-3.5" /> +91 1800-MANDI-CONNECT</span>
                             <span className="flex items-center gap-1.5"><Mail className="w-3.5 h-3.5" /> support@mandiconnect.com</span>
                         </div>
@@ -87,12 +87,12 @@ export default function Footer() {
                     <div>
                         <h4 className="text-sm font-bold text-white tracking-wider uppercase mb-4">Quick Links</h4>
                         <ul className="space-y-2.5 text-xs">
-                            <li><Link to="/products" className="hover:text-emerald-400 transition-colors">All Mandi Products</Link></li>
-                            <li><Link to="/cart" className="hover:text-emerald-400 transition-colors">Shopping Cart</Link></li>
+                            <li><Link to="/products" className="hover:text-emerald-400 transition-colors">All Wholesale Products</Link></li>
+                            <li><Link to="/cart" className="hover:text-emerald-400 transition-colors">Wholesale Order Cart</Link></li>
                             <li><Link to="/wishlist" className="hover:text-emerald-400 transition-colors">My Wishlist</Link></li>
-                            <li><Link to="/orders" className="hover:text-emerald-400 transition-colors">Track Orders</Link></li>
+                            <li><Link to="/orders" className="hover:text-emerald-400 transition-colors">Live Order Tracker</Link></li>
                             <li><Link to="/profile" className="hover:text-emerald-400 transition-colors">Account Profile</Link></li>
-                            <li><Link to="/admin/login" className="text-amber-400 hover:underline transition-colors font-semibold">Admin Login Portal</Link></li>
+                            <li><Link to="/admin/login" className="text-amber-400 hover:underline transition-colors font-bold">Admin Portal Login</Link></li>
                         </ul>
                     </div>
 
@@ -101,7 +101,7 @@ export default function Footer() {
                         <h4 className="text-sm font-bold text-white tracking-wider uppercase mb-4">Policies</h4>
                         <ul className="space-y-2.5 text-xs">
                             <li><Link to="/about" className="hover:text-emerald-400 transition-colors">About Us</Link></li>
-                            <li><Link to="/contact" className="hover:text-emerald-400 transition-colors">Contact Us</Link></li>
+                            <li><Link to="/contact" className="hover:text-emerald-400 transition-colors">Contact Support</Link></li>
                             <li><Link to="/privacy-policy" className="hover:text-emerald-400 transition-colors">Privacy Policy</Link></li>
                             <li><Link to="/terms" className="hover:text-emerald-400 transition-colors">Terms of Service</Link></li>
                             <li><Link to="/refund-policy" className="hover:text-emerald-400 transition-colors">Refund & Return Policy</Link></li>
@@ -110,10 +110,10 @@ export default function Footer() {
                 </div>
 
                 {/* Bottom Copyright */}
-                <div className="pt-8 border-t border-emerald-900/60 flex flex-col md:flex-row items-center justify-between text-xs text-gray-400 gap-4">
-                    <p>© 2026 Mandi Connect. All rights reserved. "Fresh from the Mandi, Delivered to You"</p>
-                    <div className="flex items-center gap-6 text-gray-400">
-                        <span>Safe & Secure Online Payments via Razorpay</span>
+                <div className="pt-8 border-t border-emerald-900/60 flex flex-col md:flex-row items-center justify-between text-xs text-emerald-200/60 gap-4">
+                    <p>© 2026 MandiConnect Wholesale Marketplace. All rights reserved.</p>
+                    <div className="flex items-center gap-6">
+                        <span>Razorpay B2B Secured Gateway</span>
                     </div>
                 </div>
             </div>

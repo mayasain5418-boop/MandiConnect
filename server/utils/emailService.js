@@ -20,6 +20,43 @@ const transporter = nodemailer.createTransport({
     }
 });
 
+// Send OTP Verification Email
+const sendOtpEmail = async (email, full_name, otpCode) => {
+    const mailOptions = {
+        from: `"MandiConnect Security" <${process.env.SMTP_USER || 'noreply@mandiconnect.com'}>`,
+        to: email,
+        subject: `Your MandiConnect 6-Digit Verification Code is ${otpCode}`,
+        html: `
+            <div style="font-family: Arial, sans-serif; max-width: 550px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 16px; padding: 32px; background: #ffffff;">
+                <div style="text-align: center; margin-bottom: 24px;">
+                    <h2 style="color: #0D2818; margin: 0; font-size: 24px;">Mandi<span style="color: #E67E22;">Connect</span></h2>
+                    <p style="color: #64748b; font-size: 13px; margin-top: 4px;">Direct Farm Produce & Wholesale Mandi Marketplace</p>
+                </div>
+                <div style="background: #F8FAF7; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; text-align: center;">
+                    <h3 style="color: #0D2818; margin-top: 0;">Account Verification Code</h3>
+                    <p style="color: #334155; font-size: 14px;">Hello ${full_name || 'Valued User'},</p>
+                    <p style="color: #64748b; font-size: 13px;">Use the following 6-digit OTP code to complete your registration or verification:</p>
+                    <div style="font-size: 32px; font-weight: 900; font-family: monospace; letter-spacing: 6px; color: #164E33; background: #E8F5E9; padding: 14px 24px; border-radius: 10px; display: inline-block; margin: 16px 0; border: 1px solid #a7f3d0;">
+                        ${otpCode}
+                    </div>
+                    <p style="color: #94a3b8; font-size: 12px; margin-bottom: 0;">This OTP code is valid for 15 minutes. Do not share this code with anyone.</p>
+                </div>
+            </div>
+        `
+    };
+
+    try {
+        if (smtpConfigured) {
+            await transporter.sendMail(mailOptions);
+            logger.info({ email, otpCode }, 'OTP email sent via SMTP');
+        } else {
+            logger.info({ email, otpCode }, '[SMTP Not Configured] Mock OTP email dispatched to logs');
+        }
+    } catch (error) {
+        logger.error({ err: error, email }, 'Failed to send OTP email');
+    }
+};
+
 // Send Order Notification to SINGLE ADMIN EMAIL
 const sendAdminNewOrderEmail = async (order, items, customer) => {
     const adminEmail = process.env.ADMIN_EMAIL || 'admin@mandiconnect.com';
@@ -167,9 +204,7 @@ const sendCustomerStatusEmail = async (order, newStatus, customer) => {
     }
 };
 
-// Send Password Reset Link to the account owner.
-// The raw reset token is NEVER returned in an API response — this email is the
-// only channel it travels through.
+// Send Password Reset Link
 const sendPasswordResetEmail = async (user, resetToken) => {
     const resetUrl = `${process.env.FRONTEND_URL_PRIMARY || (process.env.FRONTEND_URL || '').split(',')[0]}/reset-password?token=${resetToken}`;
 
@@ -203,6 +238,7 @@ const sendPasswordResetEmail = async (user, resetToken) => {
 };
 
 module.exports = {
+    sendOtpEmail,
     sendAdminNewOrderEmail,
     sendCustomerOrderEmail,
     sendCustomerStatusEmail,

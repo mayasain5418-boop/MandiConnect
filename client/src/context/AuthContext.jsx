@@ -35,10 +35,15 @@ export const AuthProvider = ({ children }) => {
         }
     }, []);
 
+    const sendOtp = async (email) => {
+        const res = await API.post('/auth/send-otp', { email });
+        return res.data;
+    };
+
     const loginCustomer = async (email, password) => {
         const res = await API.post('/auth/login', { email, password });
-        if (res.data.success) {
-            localStorage.setItem('mandi_token', res.data.token);
+        if (res.data.success && res.data.user) {
+            if (res.data.token) localStorage.setItem('mandi_token', res.data.token);
             localStorage.setItem('mandi_user', JSON.stringify(res.data.user));
             setUser(res.data.user);
         }
@@ -47,18 +52,33 @@ export const AuthProvider = ({ children }) => {
 
     const registerCustomer = async (data) => {
         const res = await API.post('/auth/register', data);
-        if (res.data.success) {
-            localStorage.setItem('mandi_token', res.data.token);
+        if (res.data.success && res.data.user) {
+            if (res.data.token) localStorage.setItem('mandi_token', res.data.token);
             localStorage.setItem('mandi_user', JSON.stringify(res.data.user));
             setUser(res.data.user);
         }
         return res.data;
     };
 
+    const verifyOtp = async (email, otp) => {
+        const res = await API.post('/auth/verify-otp', { email, otp });
+        if (res.data.success && res.data.user) {
+            if (res.data.token) localStorage.setItem('mandi_token', res.data.token);
+            localStorage.setItem('mandi_user', JSON.stringify(res.data.user));
+            setUser(res.data.user);
+        }
+        return res.data;
+    };
+
+    const resendOtp = async (email) => {
+        const res = await API.post('/auth/resend-otp', { email });
+        return res.data;
+    };
+
     const loginAdmin = async (email, password) => {
         const res = await API.post('/auth/admin-login', { email, password });
-        if (res.data.success) {
-            localStorage.setItem('mandi_token', res.data.token);
+        if (res.data.success && res.data.user) {
+            if (res.data.token) localStorage.setItem('mandi_token', res.data.token);
             localStorage.setItem('mandi_user', JSON.stringify(res.data.user));
             setUser(res.data.user);
         }
@@ -75,8 +95,11 @@ export const AuthProvider = ({ children }) => {
             user,
             loading,
             logout,
+            sendOtp,
             loginCustomer,
             registerCustomer,
+            verifyOtp,
+            resendOtp,
             loginAdmin,
             updateUserState,
             isAuthenticated: !!user,

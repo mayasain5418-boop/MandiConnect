@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams, useParams } from 'react-router-dom';
+import { useSearchParams, useParams, useNavigate } from 'react-router-dom';
 import { Filter, SlidersHorizontal, ArrowUpDown, Search, RefreshCw, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 import API from '../api/client';
@@ -7,6 +7,8 @@ import API from '../api/client';
 export default function Products() {
     const [searchParams, setSearchParams] = useSearchParams();
     const { slug } = useParams();
+    const navigate = useNavigate();
+
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
     const [pagination, setPagination] = useState({ page: 1, totalPages: 1 });
@@ -15,7 +17,7 @@ export default function Products() {
 
     // Filter states
     const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
-    const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || slug || '');
+    const [selectedCategory, setSelectedCategory] = useState(slug || searchParams.get('category') || '');
     const [minPrice, setMinPrice] = useState('');
     const [maxPrice, setMaxPrice] = useState('');
     const [unitFilter, setUnitFilter] = useState('');
@@ -33,23 +35,35 @@ export default function Products() {
             .catch(() => {});
     }, []);
 
-    // Sync state with URL params / route slug. The `/category/:slug` route
-    // and the `?category=` query param both carry a category SLUG (matching
-    // what the backend's `c.slug = ?` filter expects) — this used to look up
-    // the matching category and store its numeric `id` instead, which then
-    // got sent to the backend as `?category=<id>`. Since the backend only
-    // treats `category` as a slug (use `category_id` for an id filter), that
-    // sent something like `?category=3`, which never matches any category's
-    // slug — so every category page silently returned zero products.
+    // Sync state with URL params / route slug.
     useEffect(() => {
         setSearchTerm(searchParams.get('search') || '');
         if (slug) {
             setSelectedCategory(slug);
-        } else if (searchParams.get('category')) {
+        } else {
             setSelectedCategory(searchParams.get('category') || '');
         }
         setSortOption(searchParams.get('sort') || 'newest');
     }, [searchParams, slug]);
+
+    // Handle side category selection cleanly
+    const handleCategoryChange = (catSlug) => {
+        setSelectedCategory(catSlug);
+        setCurrentPage(1);
+
+        const newParams = new URLSearchParams(searchParams);
+        if (catSlug) {
+            newParams.set('category', catSlug);
+        } else {
+            newParams.delete('category');
+        }
+
+        if (slug) {
+            navigate(`/products?${newParams.toString()}`);
+        } else {
+            setSearchParams(newParams);
+        }
+    };
 
     // Fetch Products
     const fetchProducts = async () => {
@@ -57,8 +71,7 @@ export default function Products() {
             setLoading(true);
             const query = new URLSearchParams();
             if (searchTerm) query.append('search', searchTerm);
-            const categoryFilter = slug || selectedCategory;
-            if (categoryFilter) query.append('category', categoryFilter);
+            if (selectedCategory) query.append('category', selectedCategory);
             if (minPrice) query.append('min_price', minPrice);
             if (maxPrice) query.append('max_price', maxPrice);
             if (unitFilter) query.append('unit', unitFilter);
@@ -80,7 +93,7 @@ export default function Products() {
 
     useEffect(() => {
         fetchProducts();
-    }, [searchTerm, selectedCategory, slug, minPrice, maxPrice, unitFilter, sortOption, currentPage]);
+    }, [searchTerm, selectedCategory, minPrice, maxPrice, unitFilter, sortOption, currentPage]);
 
     const handleResetFilters = () => {
         setSearchTerm('');
@@ -90,7 +103,11 @@ export default function Products() {
         setUnitFilter('');
         setSortOption('newest');
         setCurrentPage(1);
-        setSearchParams({});
+        if (slug) {
+            navigate('/products');
+        } else {
+            setSearchParams({});
+        }
     };
 
     return (
@@ -174,8 +191,8 @@ export default function Products() {
                                     type="radio"
                                     name="cat"
                                     checked={selectedCategory === ''}
-                                    onChange={() => setSelectedCategory('')}
-                                    className="text-[#1F4D36]"
+                                    onChange={() => handleCategoryChange('')}
+                                    className="text-[#1F4D36] accent-[#164E33] cursor-pointer"
                                 />
                                 <span className={selectedCategory === '' ? 'font-bold text-[#1F4D36]' : 'text-gray-600'}>
                                     All Categories
@@ -187,8 +204,8 @@ export default function Products() {
                                         type="radio"
                                         name="cat"
                                         checked={selectedCategory === cat.slug}
-                                        onChange={() => setSelectedCategory(cat.slug)}
-                                        className="text-[#1F4D36]"
+                                        onChange={() => handleCategoryChange(cat.slug)}
+                                        className="text-[#1F4D36] accent-[#164E33] cursor-pointer"
                                     />
                                     <span className={selectedCategory === cat.slug ? 'font-bold text-[#1F4D36]' : 'text-gray-600'}>
                                         {cat.name}

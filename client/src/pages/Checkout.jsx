@@ -444,7 +444,7 @@ export default function Checkout() {
                                 </div>
                             )}
 
-                            {/* Online Payment via Razorpay */}
+                            {/* Online Payment via UPI / Paytm / PhonePe / Cards */}
                             <div
                                 onClick={() => setPaymentMethod('online')}
                                 className={`p-4 rounded-2xl border-2 cursor-pointer flex items-center gap-3 ${
@@ -454,9 +454,9 @@ export default function Checkout() {
                                 <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'online' ? 'border-[#1F4D36] bg-[#1F4D36] text-white' : 'border-gray-300'}`}>
                                     {paymentMethod === 'online' && <Check className="w-3 h-3" />}
                                 </div>
-                                <div>
-                                    <h4 className="text-xs font-bold text-gray-900">Razorpay Online Payment</h4>
-                                    <p className="text-[11px] text-gray-500">UPI, Cards, Net Banking & Wallets</p>
+                                <div>ṇ
+                                    <h4 className="text-xs font-bold text-gray-900">UPI, Paytm, PhonePe, Cards & NetBanking</h4>
+                                    <p className="text-[11px] text-gray-500 font-medium">Instant payment via PhonePe, Paytm, Google Pay, BHIM or any Bank Account</p>
                                 </div>
                             </div>
                         </div>

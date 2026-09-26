@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MandiConnect - B2B Agri Wholesale Marketplace | Executive Presentation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0f172a;
+      --bg-card-dark: #1e293b;
+      --border-dark: #334155;
+      --text-dark: #f8fafc;
+      --text-muted-dark: #94a3b8;
+      
+      --bg-light: #f8fafc;
+      --bg-card-light: #ffffff;
+      --border-light: #e2e8f0;
+      --text-light: #0f172a;
+      --text-muted-light: #64748b;
+
+      --primary: #10b981;
+      --primary-dark: #059669;
+      --primary-glow: rgba(16, 185, 129, 0.2);
+      --accent-gold: #f59e0b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      user-select: none;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    body.light-mode {
+      background-color: var(--bg-light);
+      color: var(--text-light);
+    }
+
+    /* Top Control Header */
+    .top-nav {
+      height: 60px;
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-dark);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 100;
+    }
+
+    body.light-mode .top-nav {
+      background: rgba(255, 255, 255, 0.85);
+      border-bottom-color: var(--border-light);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      font-size: 1.1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-badge {
+      background: var(--primary);
+      color: #000;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn {
+      background: var(--bg-card-dark);
+      border: 1px solid var(--border-dark);
+      color: var(--text-dark);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    body.light-mode .btn {
+      background: var(--bg-card-light);
+      border-color: var(--border-light);
+      color: var(--text-light);
+    }
+
+    .btn:hover {
+      border-color: var(--primary);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #000;
+      border: none;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+      color: #fff;
+    }
+
+    .slide-counter {
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--primary);
+      padding: 0 12px;
+    }
+
+    /* Main Presentation Canvas */
+    .presentation-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      position: relative;
+    }
+
+    .slide-stage {
+      width: 100%;
+      max-width: 1200px;
+      aspect-ratio: 16 / 9;
+      background: var(--bg-card-dark);
+      border: 1px solid var(--border-dark);
+      border-radius: 20px;
+      padding: 48px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    body.light-mode .slide-stage {
+      background: var(--bg-card-light);
+      border-color: var(--border-light);
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Slide Header */
+    .slide-header {
+      margin-bottom: 32px;
+    }
+
+    .slide-tag {
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .slide-title {
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      margin-bottom: 8px;
+    }
+
+    .slide-subtitle {
+      font-size: 1.05rem;
+      color: var(--text-muted-dark);
+      font-weight: 500;
+    }
+
+    body.light-mode .slide-subtitle {
+      color: var(--text-muted-light);
+    }
+
+    /* 6x6 Grid Layout */
+    .grid-6x6 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      gap: 16px;
+      flex: 1;
+    }
+
+    .card-6x6 {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border-dark);
+      border-left: 4px solid var(--primary);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      transition: all 0.25 ease;
+      animation: fadeIn 0.4s ease forwards;
+    }
+
+    body.light-mode .card-6x6 {
+      background: #f1f5f9;
+      border-color: var(--border-light);
+      border-left-color: var(--primary);
+    }
+
+    .card-6x6:hover {
+      transform: translateX(4px);
+      box-shadow: 0 10px 20px -5px var(--primary-glow);
+    }
+
+    .card-num {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--primary);
+      background: rgba(16, 185, 129, 0.15);
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .card-text {
+      font-size: 1.1rem;
+      font-weight: 700;
+      line-height: 1.35;
+      letter-spacing: -0.01em;
+    }
+
+    /* Cover Slide Layout */
+    .cover-layout {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100%;
+    }
+
+    .cover-title {
+      font-size: 3.5rem;
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.04em;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, #ffffff 0%, var(--primary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    body.light-mode .cover-title {
+      background: linear-gradient(135deg, var(--text-light) 0%, var(--primary-dark) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .cover-subtitle {
+      font-size: 1.4rem;
+      color: var(--text-muted-dark);
+      margin-bottom: 40px;
+    }
+
+    body.light-mode .cover-subtitle {
+      color: var(--text-muted-light);
+    }
+
+    /* 6x6 Badge List for Title Slide */
+    .title-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .title-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-dark);
+      padding: 16px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    body.light-mode .title-card {
+      background: #ffffff;
+      border-color: var(--border-light);
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    }
+
+    .title-card::before {
+      content: '✓';
+      color: var(--primary);
+      font-weight: 900;
+    }
+
+    /* Rule Indicator Footer */
+    .slide-footer {
+      margin-top: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--border-dark);
+      padding-top: 16px;
+      font-size: 0.75rem;
+      color: var(--text-muted-dark);
+    }
+
+    body.light-mode .slide-footer {
+      border-top-color: var(--border-light);
+      color: var(--text-muted-light);
+    }
+
+    .rule-tag {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--accent-gold);
+      padding: 4px 10px;
+      border-radius: 99px;
+      font-weight: 700;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Print Styles for PDF Export */
+    @media print {
+      body {
+        overflow: visible !important;
+        background: white !important;
+        color: black !important;
+      }
+
+      .top-nav {
+        display: none !important;
+      }
+
+      .presentation-container {
+        padding: 0 !important;
+        display: block !important;
+      }
+
+      .slide-stage {
+        page-break-after: always;
+        break-after: page;
+        border: none !important;
+        box-shadow: none !important;
+        max-width: 100% !important;
+        aspect-ratio: auto !important;
+        height: 100vh !important;
+        border-radius: 0 !important;
+        background: white !important;
+        color: black !important;
+      }
+
+      .card-6x6 {
+        background: #f8fafc !important;
+        border-color: #cbd5e1 !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Control Bar -->
+  <header class="top-nav">
+    <div class="brand">
+      <span>🌾 MandiConnect</span>
+      <span class="brand-badge">Executive Pitch Deck</span>
+    </div>
+
+    <div class="nav-controls">
+      <span class="slide-counter" id="counter">01 / 12</span>
+      <button class="btn" onclick="prevSlide()">◀ Prev</button>
+      <button class="btn btn-primary" onclick="nextSlide()">Next ▶</button>
+      <button class="btn" onclick="toggleTheme()">🌓 Theme</button>
+      <button class="btn" onclick="window.print()">🖨️ Export PDF</button>
+    </div>
+  </header>
+
+  <!-- Presentation Stage -->
+  <main class="presentation-container">
+    <div class="slide-stage" id="slideStage">
+      <!-- Dynamic Slide Content rendered via JS -->
+    </div>
+  </main>
+
+  <script>
+    const slides = [
+      {
+        type: "cover",
+        tag: "EXECUTIVE PRESENTATION • 6×6 RULE COMPLIANT",
+        title: "MandiConnect Platform",
+        subtitle: "Enterprise B2B Wholesale Agricultural Marketplace",
+        bullets: [
+          "Direct Farmer To Commercial Marketplace",
+          "Eliminating Middlemen In Agricultural Trade",
+          "Real Time Inventory Dynamic Pricing",
+          "Enterprise Security Scalable Cloud Architecture",
+          "Automated Invoicing District Logistics Matrix",
+          "High Performance React Node Architecture"
+        ]
+      },
+      {
+        type: "standard",
+        number: "01",
+        category: "PROBLEM STATEMENT",
+        title: "Agricultural Supply Chain Inefficiencies",
+        subtitle: "Current wholesale agri-trade suffers heavy structural value leakage.",
+        bullets: [
+          "Multi Layered Middlemen Reduce Farmer Earnings",
+          "High Post Harvest Loss In Transport",
+          "Opaque Wholesale Pricing Distorts Markets",
+          "Fragmented Logistics Cause Delivery Delays",
+          "Unreliable Cash Flow For Farmers",
+          "Manual Paper Based Trade Accounting Systems"
+        ]
+      },
+      {
+        type: "standard",
+        number: "02",
+        category": "STRATEGIC SOLUTION",
+        title: "Direct B2B Agri Wholesale Engine",
+        subtitle: "Transforming agricultural commerce through direct digital connectivity.",
+        bullets: [
+          "Direct Mandi Vendor Buyer Connectivity",
+          "Dynamic Tiered Bulk Pricing Models",
+          "Verified District Zone Shipping Matrix",
+          "Secure Digital Razorpay Payment Gateway",
+          "Instant GST Compliant PDF Invoicing",
+          "Multi Channel Web Android Experience"
+        ]
+      },
+      {
+        type: "standard",
+        number: "03",
+        category": "TARGET MARKET",
+        title: "High Volume Ecosystem Partners",
+        subtitle": "Connecting primary produce suppliers directly to commercial buyers.",
+        bullets: [
+          "Farmers And Local Mandi Vendors",
+          "Hotels Restaurants And Catering Businesses",
+          "Bulk Agricultural Produce Commercial Buyers",
+          "Institutional Food Supply Chain Managers",
+          "Regional Logistics And Fleet Partners",
+          "Multi City Retail Produce Distributors"
+        ]
+      },
+      {
+        type: "standard",
+        number: "04",
+        category": "PLATFORM CAPABILITY",
+        title: "Core B2B Wholesale Features",
+        subtitle": "Purpose-built for volume purchasing, dynamic pricing & vendor control.",
+        bullets: [
+          "Tiered Volume Based Wholesale Discounts",
+          "Real Time Item Stock Tracking",
+          "Smart Shopping Cart Volume Calculators",
+          "Multi Address Delivery Zone Matrix",
+          "Automated Order Lifecycle Status Sweeps",
+          "Interactive Vendor Admin Product Dashboards"
+        ]
+      },
+      {
+        type: "standard",
+        number: "05",
+        category": "SYSTEM ARCHITECTURE",
+        title: "Enterprise Grade Tech Stack",
+        subtitle": "Resilient, high-concurrency modern web and mobile architecture.",
+        bullets: [
+          "React Nineteen Modern Frontend SPA",
+          "Fast Vite Bundling Code Splitting",
+          "Robust Node Express REST APIs",
+          "Relational MySQL Eight Database Cluster",
+          "Secure HTTP Only JWT Authentication",
+          "Tailwind CSS Enterprise Design Tokens"
+        ]
+      },
+      {
+        type: "standard",
+        number: "06",
+        category": "DATA & CONCURRENCY",
+        title: "High Concurrency Stock Integrity",
+        subtitle": "Row-level transactional safety eliminating overselling during peak trade.",
+        bullets: [
+          "Row Level Select For Update Locking",
+          "Atomic Stock Reservation Guard Logic",
+          "Automated Expired Cart Sweep Workers",
+          "Strict ACIDs Transaction Isolation Levels",
+          "Zero Overselling On High Demand",
+          "Idempotent Order Creation Webhook Safety"
+        ]
+      },
+      {
+        type: "standard",
+        number: "07",
+        category": "LOGISTICS ENGINE",
+        title: "Smart District Shipping Matrix",
+        subtitle": "Regional pincode validation engine for accurate zone shipping fees.",
+        bullets: [
+          "Pincode Level Delivery Serviceability Rules",
+          "Dynamic Regional Zone Fee Calculations",
+          "Minimum Order Free Shipping Thresholds",
+          "Real Time Buyer Address Validation",
+          "Multi District Fulfillment Routing Rules",
+          "Integrated Dispatch Status Order Tracking"
+        ]
+      },
+      {
+        type: "standard",
+        number: "08",
+        category": "FINANCIAL COMPLIANCE",
+        title: "Automated Payments & GST Invoices",
+        subtitle": "Secure digital payment settlement with sequential tax compliance.",
+        bullets: [
+          "Seamless Razorpay Payment Verification Flow",
+          "Webhook Signature Protection Fraud Prevention",
+          "Automatic Sequential GST Invoicing Numbers",
+          "Instant Compliant PDF Invoice Downloads",
+          "Automated Refund Processing API Hooks",
+          "Transparent Itemized Tax Breakdown Summaries"
+        ]
+      },
+      {
+        type: "standard",
+        number: "09",
+        category": "DEVOPS & SECURITY",
+        title: "Production Container Architecture",
+        subtitle": "Containerized multi-stage deployments with enterprise edge security.",
+        bullets: [
+          "Multi Stage Container Build Optimization",
+          "Isolated Nginx Edge Static Proxy",
+          "Automated Docker Compose Service Orchestration",
+          "High Efficiency Gzip Asset Compression",
+          "Strict Helmet HTTP Security Headers",
+          "Zero Downtime VPS PM2 Operations"
+        ]
+      },
+      {
+        type: "standard",
+        number: "10",
+        category": "ECONOMIC IMPACT",
+        title: "Sustainable Value Creation",
+        subtitle": "Maximizing farm gate income while optimizing buyer procurement cost.",
+        bullets: [
+          "Fair Direct Pricing Increases Yield",
+          "Commission Based B2B Marketplace Revenue",
+          "Premium Vendor Visibility Subscriptions Model",
+          "Logistics Freight Handling Service Fee",
+          "Reduced Produce Waste Across Transport",
+          "Transparent Trust Matrix For Wholesale"
+        ]
+      },
+      {
+        type: "standard",
+        number: "11",
+        category": "STRATEGIC ROADMAP",
+        title: "Future Growth & Innovation",
+        subtitle": "Expanding platform intelligence and national marketplace reach.",
+        bullets: [
+          "AI Driven Crop Price Forecasts",
+          "Native Android iOS Mobile Apps",
+          "Cold Chain Fleet Partner Integrations",
+          "Multilingual Regional Voice Assistant Search",
+          "Automated Escrow Payment Clearance Model",
+          "Regional Mandi Expansion Across States"
+        ]
+      }
+    ];
+
+    let currentSlide = 0;
+
+    function renderSlide() {
+      const stage = document.getElementById("slideStage");
+      const slide = slides[currentSlide];
+
+      document.getElementById("counter").innerText = `${String(currentSlide + 1).padStart(2, '0')} / ${slides.length}`;
+
+      if (slide.type === "cover") {
+        stage.innerHTML = `
+          <div class="cover-layout">
+            <div class="slide-tag">${slide.tag}</div>
+            <h1 class="cover-title">${slide.title}</h1>
+            <p class="cover-subtitle">${slide.subtitle}</p>
+            <div class="title-grid">
+              ${slide.bullets.map(b => `<div class="title-card">${b}</div>`).join('')}
+            </div>
+          </div>
+          <div class="slide-footer">
+            <span>MandiConnect B2B Marketplace • Executive Overview</span>
+            <span class="rule-tag">6×6 Executive Rule: Max 6 Lines | Max 6 Words</span>
+          </div>
+        `;
+      } else {
+        stage.innerHTML = `
+          <div class="slide-header">
+            <div class="slide-tag">SLIDE ${slide.number} • ${slide.category}</div>
+            <h2 class="slide-title">${slide.title}</h2>
+            <p class="slide-subtitle">${slide.subtitle}</p>
+          </div>
+          <div class="grid-6x6">
+            ${slide.bullets.map((b, idx) => `
+              <div class="card-6x6" style="animation-delay: ${idx * 0.05}s">
+                <div class="card-num">0${idx + 1}</div>
+                <div class="card-text">${b}</div>
+              </div>
+            `).join('')}
+          </div>
+          <div class="slide-footer">
+            <span>MandiConnect Enterprise Architecture</span>
+            <span class="rule-tag">6×6 Rule: Exactly 6 Cards | Max 6 Words Each</span>
+          </div>
+        `;
+      }
+    }
+
+    function nextSlide() {
+      if (currentSlide < slides.length - 1) {
+        currentSlide++;
+        renderSlide();
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 0) {
+        currentSlide--;
+        renderSlide();
+      }
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle("light-mode");
+    }
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowRight" || e.key === "Space" || e.key === "PageDown") {
+        nextSlide();
+      } else if (e.key === "ArrowLeft" || e.key === "PageUp") {
+        prevSlide();
+      }
+    });
+
+    // Initial render
+    renderSlide();
+  </script>
+</body>
+</html>

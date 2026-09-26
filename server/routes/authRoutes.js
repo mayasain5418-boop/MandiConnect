@@ -1,7 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const {
+    sendOtp,
     registerCustomer,
+    verifyOtp,
+    resendOtp,
     loginCustomer,
     loginAdmin,
     getProfile,
@@ -20,7 +23,10 @@ const {
     resetPasswordValidation
 } = require('../validators');
 
+router.post('/send-otp', authRateLimiter, sendOtp);
 router.post('/register', authRateLimiter, registerValidation, registerCustomer);
+router.post('/verify-otp', authRateLimiter, verifyOtp);
+router.post('/resend-otp', authRateLimiter, resendOtp);
 router.post('/login', authRateLimiter, loginValidation, loginCustomer);
 router.post('/admin-login', authRateLimiter, adminLoginValidation, loginAdmin);
 router.post('/logout', logout);

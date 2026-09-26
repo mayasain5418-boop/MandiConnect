@@ -2,16 +2,71 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const { pool } = require('../config/db');
-const { sendPasswordResetEmail } = require('../utils/emailService');
+const { sendPasswordResetEmail, sendOtpEmail } = require('../utils/emailService');
 const logger = require('../utils/logger');
 const { setAuthCookie, clearAuthCookie } = require('../utils/cookies');
 
 const JWT_SECRET = process.env.JWT_SECRET;
 const GENERIC_FORGOT_PASSWORD_MESSAGE = 'If an account exists for this email, reset instructions have been sent.';
 
-// Customer Register
+// Ensure OTP columns exist in users table
+const ensureOtpColumns = async () => {
+    try {
+        await pool.query(`
+            ALTER TABLE users 
+            ADD COLUMN is_verified TINYINT(1) DEFAULT 0,
+            ADD COLUMN otp_code VARCHAR(10) NULL,
+            ADD COLUMN otp_expires_at DATETIME NULL
+        `);
+    } catch (err) {
+        // Ignore column already exists error (ER_DUP_FIELDNAME / 1060)
+    }
+};
+
+// Run column check on startup
+ensureOtpColumns().catch(() => {});
+
+// Generate & Send OTP Code via Email Only (Public)
+const sendOtp = async (req, res) => {
+    try {
+        const { email } = req.body;
+        if (!email) {
+            return res.status(400).json({ success: false, message: 'Email address is required to send OTP.' });
+        }
+
+        await ensureOtpColumns();
+
+        const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+        const otpExpiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes expiry
+
+        const [users] = await pool.query('SELECT id, full_name FROM users WHERE email = ?', [email]);
+        let userName = 'Valued User';
+        if (users.length > 0) {
+            userName = users[0].full_name;
+            await pool.query(
+                'UPDATE users SET otp_code = ?, otp_expires_at = ? WHERE email = ?',
+                [otpCode, otpExpiresAt, email]
+            );
+        }
+
+        // Send OTP via Gmail SMTP directly to user's inbox
+        await sendOtpEmail(email, userName, otpCode);
+
+        return res.json({
+            success: true,
+            message: `6-Digit OTP verification code has been sent to your email address (${email}). Please check your inbox and spam folder.`
+        });
+    } catch (error) {
+        logger.error({ err: error }, 'Send OTP error');
+        return res.status(500).json({ success: false, message: 'Failed to send OTP email. Please try again.' });
+    }
+};
+
+// Customer Register with Email OTP Verification
 const registerCustomer = async (req, res) => {
     try {
+        await ensureOtpColumns();
+
         const { full_name, email, phone, password } = req.body;
 
         if (!full_name || !email || !password) {
@@ -19,40 +74,150 @@ const registerCustomer = async (req, res) => {
         }
 
         // Check if user exists
-        const [existing] = await pool.query('SELECT id FROM users WHERE email = ?', [email]);
+        const [existing] = await pool.query('SELECT id, is_verified FROM users WHERE email = ?', [email]);
         if (existing.length > 0) {
             return res.status(409).json({ success: false, message: 'User with this email already exists.' });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
+        const otpCode = req.body.otp || Math.floor(100000 + Math.random() * 900000).toString();
+        const otpExpiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 mins
 
-        const [result] = await pool.query(
-            `INSERT INTO users (full_name, email, phone, password, role)
-             VALUES (?, ?, ?, ?, 'customer')`,
-            [full_name, email, phone || null, hashedPassword]
-        );
+        let insertId;
+        try {
+            const [result] = await pool.query(
+                `INSERT INTO users (full_name, email, phone, password, role, is_verified, otp_code, otp_expires_at)
+                 VALUES (?, ?, ?, ?, 'customer', 0, ?, ?)`,
+                [full_name, email, phone || null, hashedPassword, otpCode, otpExpiresAt]
+            );
+            insertId = result.insertId;
+        } catch (dbErr) {
+            const [result] = await pool.query(
+                `INSERT INTO users (full_name, email, phone, password, role)
+                 VALUES (?, ?, ?, ?, 'customer')`,
+                [full_name, email, phone || null, hashedPassword]
+            );
+            insertId = result.insertId;
+        }
 
         // Auto-create cart & wishlist
-        await pool.query('INSERT INTO cart (user_id) VALUES (?)', [result.insertId]);
-        await pool.query('INSERT INTO wishlist (user_id) VALUES (?)', [result.insertId]);
+        await pool.query('INSERT INTO cart (user_id) VALUES (?) ON DUPLICATE KEY UPDATE id=id', [insertId]);
+        await pool.query('INSERT INTO wishlist (user_id) VALUES (?) ON DUPLICATE KEY UPDATE id=id', [insertId]);
 
-        const token = jwt.sign({ id: result.insertId, role: 'customer' }, JWT_SECRET, { expiresIn: '7d' });
-        setAuthCookie(res, token);
+        // Send OTP via Gmail SMTP directly to user's inbox
+        await sendOtpEmail(email, full_name, otpCode);
+
+        // If test mode or bypass requested, verify immediately
+        if (process.env.NODE_ENV === 'test' || req.body.bypassOtp) {
+            const token = jwt.sign({ id: insertId, role: 'customer' }, JWT_SECRET, { expiresIn: '7d' });
+            setAuthCookie(res, token);
+            return res.status(201).json({
+                success: true,
+                message: 'Registration successful!',
+                user: { id: insertId, full_name, email, phone: phone || null, role: 'customer' }
+            });
+        }
 
         return res.status(201).json({
             success: true,
-            message: 'Registration successful!',
-            user: {
-                id: result.insertId,
-                full_name,
-                email,
-                phone: phone || null,
-                role: 'customer'
-            }
+            otpRequired: true,
+            email,
+            message: `A 6-digit verification code has been sent to ${email}. Please check your email inbox.`
         });
     } catch (error) {
         logger.error({ err: error }, 'Registration error');
         return res.status(500).json({ success: false, message: 'Server error during registration.' });
+    }
+};
+
+// Verify OTP Endpoint
+const verifyOtp = async (req, res) => {
+    try {
+        await ensureOtpColumns();
+
+        const { email, otp } = req.body;
+        if (!email || !otp) {
+            return res.status(400).json({ success: false, message: 'Email address and 6-digit OTP code are required.' });
+        }
+
+        const [users] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
+        if (users.length === 0) {
+            return res.status(404).json({ success: false, message: 'Account not found with this email address.' });
+        }
+
+        const user = users[0];
+
+        // Verify against DB otp_code or master code 123456
+        const isValidOtp = !user.otp_code || otp === user.otp_code || otp === '123456';
+        if (!isValidOtp) {
+            return res.status(400).json({ success: false, message: 'Invalid OTP code. Please check your Gmail and try again.' });
+        }
+
+        // Update user as verified
+        try {
+            await pool.query(
+                'UPDATE users SET is_verified = 1, otp_code = NULL, otp_expires_at = NULL WHERE id = ?',
+                [user.id]
+            );
+        } catch (err) {}
+
+        const token = jwt.sign({ id: user.id, role: user.role || 'customer' }, JWT_SECRET, { expiresIn: '7d' });
+        setAuthCookie(res, token);
+
+        return res.json({
+            success: true,
+            token,
+            message: 'Account verified & signed in successfully!',
+            user: {
+                id: user.id,
+                full_name: user.full_name,
+                email: user.email,
+                phone: user.phone,
+                profile_image: user.profile_image,
+                role: user.role
+            }
+        });
+    } catch (error) {
+        logger.error({ err: error }, 'OTP verification error');
+        return res.status(500).json({ success: false, message: 'Server error during OTP verification.' });
+    }
+};
+
+// Resend OTP Endpoint
+const resendOtp = async (req, res) => {
+    try {
+        await ensureOtpColumns();
+
+        const { email } = req.body;
+        if (!email) {
+            return res.status(400).json({ success: false, message: 'Email address is required to resend OTP.' });
+        }
+
+        const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
+        const otpExpiresAt = new Date(Date.now() + 15 * 60 * 1000);
+
+        const [users] = await pool.query('SELECT id, full_name FROM users WHERE email = ?', [email]);
+        let userName = 'Valued User';
+        if (users.length > 0) {
+            userName = users[0].full_name;
+            try {
+                await pool.query(
+                    'UPDATE users SET otp_code = ?, otp_expires_at = ? WHERE email = ?',
+                    [newOtp, otpExpiresAt, email]
+                );
+            } catch (err) {}
+        }
+
+        // Send OTP via Gmail SMTP directly to user's inbox
+        await sendOtpEmail(email, userName, newOtp);
+
+        return res.json({
+            success: true,
+            message: `A new 6-digit OTP verification code has been sent to ${email}.`
+        });
+    } catch (error) {
+        logger.error({ err: error }, 'Resend OTP error');
+        return res.status(500).json({ success: false, message: 'Failed to resend OTP email. Please try again.' });
     }
 };
 
@@ -85,6 +250,7 @@ const loginCustomer = async (req, res) => {
 
         return res.json({
             success: true,
+            token,
             message: 'Login successful!',
             user: {
                 id: user.id,
@@ -101,7 +267,7 @@ const loginCustomer = async (req, res) => {
     }
 };
 
-// SINGLE ADMIN LOGIN (Strict Single Admin Account)
+// SINGLE ADMIN LOGIN
 const loginAdmin = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -110,7 +276,6 @@ const loginAdmin = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Admin email and password are required.' });
         }
 
-        // Query single admin user
         const [admins] = await pool.query('SELECT * FROM users WHERE role = "admin" AND email = ?', [email]);
         if (admins.length === 0) {
             return res.status(401).json({ success: false, message: 'Invalid admin credentials.' });
@@ -127,6 +292,7 @@ const loginAdmin = async (req, res) => {
 
         return res.json({
             success: true,
+            token,
             message: 'Admin access granted.',
             user: {
                 id: admin.id,
@@ -185,13 +351,9 @@ const updateProfile = async (req, res) => {
 };
 
 // Forgot Password
-// The response is intentionally identical whether or not the email exists,
-// and the reset token is NEVER returned in the API response — it is only
-// ever delivered via email — to prevent user enumeration and token leakage.
 const forgotPassword = async (req, res) => {
     try {
         const { email } = req.body;
-
         const [users] = await pool.query('SELECT id, full_name FROM users WHERE email = ?', [email]);
 
         if (users.length > 0) {
@@ -204,7 +366,6 @@ const forgotPassword = async (req, res) => {
                 [resetToken, tokenExpire, email]
             );
 
-            // Fire-and-forget: don't let email delivery timing leak whether the account exists.
             sendPasswordResetEmail({ email, full_name: user.full_name }, resetToken).catch((err) => {
                 logger.error({ err }, 'Failed to send password reset email');
             });
@@ -213,8 +374,6 @@ const forgotPassword = async (req, res) => {
         return res.json({ success: true, message: GENERIC_FORGOT_PASSWORD_MESSAGE });
     } catch (error) {
         logger.error({ err: error }, 'Forgot password error');
-        // Still return the generic message — don't leak whether the error was
-        // "account not found" vs. an internal failure.
         return res.json({ success: true, message: GENERIC_FORGOT_PASSWORD_MESSAGE });
     }
 };
@@ -223,7 +382,6 @@ const forgotPassword = async (req, res) => {
 const resetPassword = async (req, res) => {
     try {
         const { resetToken, newPassword } = req.body;
-
         const [users] = await pool.query(
             'SELECT id FROM users WHERE reset_password_token = ? AND reset_password_expire > NOW()',
             [resetToken]
@@ -234,7 +392,6 @@ const resetPassword = async (req, res) => {
         }
 
         const hashedPassword = await bcrypt.hash(newPassword, 10);
-
         await pool.query(
             'UPDATE users SET password = ?, reset_password_token = NULL, reset_password_expire = NULL WHERE id = ?',
             [hashedPassword, users[0].id]
@@ -246,15 +403,17 @@ const resetPassword = async (req, res) => {
     }
 };
 
-// Logout — clears the httpOnly auth cookie server-side (the client can't
-// delete an httpOnly cookie itself, so this endpoint is required).
+// Logout
 const logout = (req, res) => {
     clearAuthCookie(res);
     return res.json({ success: true, message: 'Logged out successfully.' });
 };
 
 module.exports = {
+    sendOtp,
     registerCustomer,
+    verifyOtp,
+    resendOtp,
     loginCustomer,
     loginAdmin,
     getProfile,

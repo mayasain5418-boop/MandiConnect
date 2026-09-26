@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Lock, ArrowRight } from 'lucide-react';
+import { Lock, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import API from '../api/client';
 import { useToast } from '../context/ToastContext';
 
@@ -11,6 +11,7 @@ export default function ResetPassword() {
     const { showToast } = useToast();
 
     const [newPassword, setNewPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
 
     const handleSubmit = async (e) => {
@@ -43,15 +44,25 @@ export default function ResetPassword() {
                 <form onSubmit={handleSubmit} className="space-y-4 text-xs">
                     <div>
                         <label className="font-bold text-gray-700 block mb-1">New Password</label>
-                        <input
-                            type="password"
-                            value={newPassword}
-                            onChange={e => setNewPassword(e.target.value)}
-                            required
-                            minLength={6}
-                            placeholder="At least 6 characters"
-                            className="w-full p-3 bg-[#FBF8F1] border border-gray-200 rounded-xl"
-                        />
+                        <div className="relative">
+                            <input
+                                type={showPassword ? 'text' : 'password'}
+                                value={newPassword}
+                                onChange={e => setNewPassword(e.target.value)}
+                                required
+                                minLength={6}
+                                placeholder="At least 6 characters"
+                                className="w-full p-3 pl-10 pr-10 bg-[#FBF8F1] border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#1F4D36]"
+                            />
+                            <Lock className="w-4 h-4 text-gray-400 absolute left-3 top-3.5" />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600 focus:outline-none"
+                            >
+                                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                            </button>
+                        </div>
                     </div>
 
                     <button
