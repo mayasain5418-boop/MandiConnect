@@ -7,6 +7,7 @@ import { useWishlist } from '../context/WishlistContext';
 import { resolveMediaUrl } from '../utils/media';
 import API from '../api/client';
 import RateTicker from './RateTicker';
+import MandiLogo from './common/MandiLogo';
 
 export default function Navbar() {
     const { user, isAuthenticated, isAdmin, logout } = useAuth();
@@ -101,9 +102,7 @@ export default function Navbar() {
                 <div className="flex items-center justify-between h-20 gap-4">
                     {/* Brand Logo */}
                     <Link to="/" className="flex items-center gap-3 shrink-0 group">
-                        <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#0D2818] via-[#164E33] to-[#248A68] flex items-center justify-center text-white shadow-md group-hover:scale-105 transition-transform duration-300">
-                            <Leaf className="w-6 h-6 text-emerald-400" />
-                        </div>
+                        <MandiLogo variant="badge" size="md" className="group-hover:scale-105 transition-transform duration-300 shadow-md !w-11 !h-11" />
                         <div>
                             <span className="text-2xl font-black tracking-tight text-[#0D2818] font-serif block leading-none">
                                 Mandi<span className="text-[#E67E22]">Connect</span>

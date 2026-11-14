@@ -40,14 +40,15 @@ const sendOtp = async (req, res) => {
         const otpExpiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes expiry
 
         const [users] = await pool.query('SELECT id, full_name FROM users WHERE email = ?', [email]);
-        let userName = 'Valued User';
-        if (users.length > 0) {
-            userName = users[0].full_name;
-            await pool.query(
-                'UPDATE users SET otp_code = ?, otp_expires_at = ? WHERE email = ?',
-                [otpCode, otpExpiresAt, email]
-            );
+        if (users.length === 0) {
+            return res.status(404).json({ success: false, message: 'No account exists for this email. Please register first.' });
         }
+
+        const userName = users[0].full_name;
+        await pool.query(
+            'UPDATE users SET otp_code = ?, otp_expires_at = ? WHERE email = ?',
+            [otpCode, otpExpiresAt, email]
+        );
 
         // Send OTP via Gmail SMTP directly to user's inbox
         await sendOtpEmail(email, userName, otpCode);
@@ -83,22 +84,12 @@ const registerCustomer = async (req, res) => {
         const otpCode = req.body.otp || Math.floor(100000 + Math.random() * 900000).toString();
         const otpExpiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 mins
 
-        let insertId;
-        try {
-            const [result] = await pool.query(
-                `INSERT INTO users (full_name, email, phone, password, role, is_verified, otp_code, otp_expires_at)
-                 VALUES (?, ?, ?, ?, 'customer', 0, ?, ?)`,
-                [full_name, email, phone || null, hashedPassword, otpCode, otpExpiresAt]
-            );
-            insertId = result.insertId;
-        } catch (dbErr) {
-            const [result] = await pool.query(
-                `INSERT INTO users (full_name, email, phone, password, role)
-                 VALUES (?, ?, ?, ?, 'customer')`,
-                [full_name, email, phone || null, hashedPassword]
-            );
-            insertId = result.insertId;
-        }
+        const [result] = await pool.query(
+            `INSERT INTO users (full_name, email, phone, password, role, is_verified, otp_code, otp_expires_at)
+             VALUES (?, ?, ?, ?, 'customer', 0, ?, ?)`,
+            [full_name, email, phone || null, hashedPassword, otpCode, otpExpiresAt]
+        );
+        const insertId = result.insertId;
 
         // Auto-create cart & wishlist
         await pool.query('INSERT INTO cart (user_id) VALUES (?) ON DUPLICATE KEY UPDATE id=id', [insertId]);
@@ -136,7 +127,8 @@ const verifyOtp = async (req, res) => {
         await ensureOtpColumns();
 
         const { email, otp } = req.body;
-        if (!email || !otp) {
+        const submittedOtp = typeof otp === 'string' ? otp.trim() : '';
+        if (!email || !/^\d{6}$/.test(submittedOtp)) {
             return res.status(400).json({ success: false, message: 'Email address and 6-digit OTP code are required.' });
         }
 
@@ -147,19 +139,23 @@ const verifyOtp = async (req, res) => {
 
         const user = users[0];
 
-        // Verify against DB otp_code or master code 123456
-        const isValidOtp = !user.otp_code || otp === user.otp_code || otp === '123456';
-        if (!isValidOtp) {
+        const isTestOtp = process.env.NODE_ENV === 'test' && submittedOtp === '123456';
+        const otpExpiry = user.otp_expires_at ? new Date(user.otp_expires_at).getTime() : NaN;
+        if (!isTestOtp && (!user.otp_code || !Number.isFinite(otpExpiry))) {
+            return res.status(400).json({ success: false, message: 'No active OTP was found. Please request a new code.' });
+        }
+        if (!isTestOtp && otpExpiry <= Date.now()) {
+            return res.status(400).json({ success: false, message: 'This OTP has expired. Please request a new code.' });
+        }
+        if (!isTestOtp && submittedOtp !== String(user.otp_code)) {
             return res.status(400).json({ success: false, message: 'Invalid OTP code. Please check your Gmail and try again.' });
         }
 
         // Update user as verified
-        try {
-            await pool.query(
-                'UPDATE users SET is_verified = 1, otp_code = NULL, otp_expires_at = NULL WHERE id = ?',
-                [user.id]
-            );
-        } catch (err) {}
+        await pool.query(
+            'UPDATE users SET is_verified = 1, otp_code = NULL, otp_expires_at = NULL WHERE id = ?',
+            [user.id]
+        );
 
         const token = jwt.sign({ id: user.id, role: user.role || 'customer' }, JWT_SECRET, { expiresIn: '7d' });
         setAuthCookie(res, token);
@@ -197,16 +193,15 @@ const resendOtp = async (req, res) => {
         const otpExpiresAt = new Date(Date.now() + 15 * 60 * 1000);
 
         const [users] = await pool.query('SELECT id, full_name FROM users WHERE email = ?', [email]);
-        let userName = 'Valued User';
-        if (users.length > 0) {
-            userName = users[0].full_name;
-            try {
-                await pool.query(
-                    'UPDATE users SET otp_code = ?, otp_expires_at = ? WHERE email = ?',
-                    [newOtp, otpExpiresAt, email]
-                );
-            } catch (err) {}
+        if (users.length === 0) {
+            return res.status(404).json({ success: false, message: 'No account exists for this email.' });
         }
+
+        const userName = users[0].full_name;
+        await pool.query(
+            'UPDATE users SET otp_code = ?, otp_expires_at = ? WHERE email = ?',
+            [newOtp, otpExpiresAt, email]
+        );
 
         // Send OTP via Gmail SMTP directly to user's inbox
         await sendOtpEmail(email, userName, newOtp);

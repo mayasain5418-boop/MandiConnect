@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Leaf, Phone, Mail, MapPin, ShieldCheck, Truck, Award } from 'lucide-react';
+import MandiLogo from './common/MandiLogo';
 
 export default function Footer() {
     return (
@@ -54,9 +55,7 @@ export default function Footer() {
                     {/* Brand Info */}
                     <div className="md:col-span-2 space-y-4">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#164E33] to-[#248A68] flex items-center justify-center text-white font-bold shadow-md">
-                                <Leaf className="w-5 h-5 text-emerald-300" />
-                            </div>
+                            <MandiLogo variant="badge" size="md" className="shadow-md" />
                             <span className="text-2xl font-black tracking-tight text-white font-serif">
                                 Mandi<span className="text-[#E67E22]">Connect</span>
                             </span>

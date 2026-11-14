@@ -156,3 +156,31 @@ To take an automated daily MySQL backup:
 ```bash
 docker compose exec db mysqldump -u mandi_user -pmandi_password_change_me mandi_connect > backup_$(date +%Y%m%d).sql
 ```
+
+## 5. Android App & Google Play
+
+The Android app is built with Capacitor. Deploy the API first and use its public HTTPS API URL when building the app; do not ship the example URL or the local `localhost` fallback.
+
+From PowerShell, set the production API URL and build/sync the web app:
+
+```powershell
+cd client
+$env:VITE_API_URL = "https://your-api-domain.com/api"
+npm ci
+npm run cap:build
+```
+
+Create a new upload keystore for the Play Console, or use the upload key associated with the existing Play app. Keep the keystore and its passwords backed up securely. The old signing values previously placed in the Android build file must not be used for a public release; rotate that key if it has ever been shared or used outside this private workspace.
+
+Set these environment variables in the same PowerShell session before building a release. Use the actual absolute keystore path and enter the secrets directly in your local terminal; do not commit them or send them in chat:
+
+```powershell
+$env:MANDICONNECT_KEYSTORE_PATH = "C:\secure\mandiconnect-upload-key.jks"
+$env:MANDICONNECT_KEYSTORE_PASSWORD = "<keystore password>"
+$env:MANDICONNECT_KEY_ALIAS = "<key alias>"
+$env:MANDICONNECT_KEY_PASSWORD = "<key password>"
+cd android
+.\gradlew.bat bundleRelease
+```
+
+The signed Android App Bundle is created at `client/android/app/build/outputs/bundle/release/app-release.aab`. Upload it from the Google Play Console, complete the store listing, content rating, data safety and app access declarations, and submit the selected testing or production track for review. Google Play account access and acceptance of those declarations must be completed by the account owner.

@@ -1,5 +1,12 @@
 apply plugin: 'com.android.application'
 
+def releaseStoreFile = System.getenv('MANDICONNECT_KEYSTORE_PATH')
+def releaseStorePassword = System.getenv('MANDICONNECT_KEYSTORE_PASSWORD')
+def releaseKeyAlias = System.getenv('MANDICONNECT_KEY_ALIAS')
+def releaseKeyPassword = System.getenv('MANDICONNECT_KEY_PASSWORD')
+def hasReleaseSigning = [releaseStoreFile, releaseStorePassword, releaseKeyAlias, releaseKeyPassword]
+    .every { it != null && !it.trim().isEmpty() } && file(releaseStoreFile).isFile()
+
 android {
     namespace = "com.mandiconnect.app"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -16,8 +23,21 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        if (hasReleaseSigning) {
+            release {
+                storeFile file(releaseStoreFile)
+                storePassword releaseStorePassword
+                keyAlias releaseKeyAlias
+                keyPassword releaseKeyPassword
+            }
+        }
+    }
     buildTypes {
         release {
+            if (hasReleaseSigning) {
+                signingConfig signingConfigs.release
+            }
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -43,6 +63,16 @@ dependencies {
 }
 
 apply from: 'capacitor.build.gradle'
+
+tasks.configureEach {
+    if (name == 'bundleRelease' || name == 'assembleRelease') {
+        doFirst {
+            if (!hasReleaseSigning) {
+                throw new GradleException('Release signing is required. Set MANDICONNECT_KEYSTORE_PATH, MANDICONNECT_KEYSTORE_PASSWORD, MANDICONNECT_KEY_ALIAS, and MANDICONNECT_KEY_PASSWORD.')
+            }
+        }
+    }
+}
 
 try {
     def servicesJSON = file('google-services.json')

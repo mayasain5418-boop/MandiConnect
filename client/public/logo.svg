@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 160" width="100%" height="100%">
+  <defs>
+    <!-- Left Leaf Wing: Emerald Vitality -->
+    <linearGradient id="full-leaf-l" x1="0%" y1="100%" x2="80%" y2="0%">
+      <stop offset="0%" stop-color="#059669" />
+      <stop offset="50%" stop-color="#10B981" />
+      <stop offset="100%" stop-color="#34D399" />
+    </linearGradient>
+
+    <!-- Right Leaf Wing: Fresh Mint & Jade -->
+    <linearGradient id="full-leaf-r" x1="20%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34D399" />
+      <stop offset="50%" stop-color="#10B981" />
+      <stop offset="100%" stop-color="#047857" />
+    </linearGradient>
+
+    <!-- Center Sprout & Sun: Harvest Gold -->
+    <linearGradient id="full-sun" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#D97706" />
+      <stop offset="50%" stop-color="#F59E0B" />
+      <stop offset="100%" stop-color="#FDE047" />
+    </linearGradient>
+
+    <!-- Bridge Arc Gradient -->
+    <linearGradient id="full-arc" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#10B981" />
+      <stop offset="50%" stop-color="#F59E0B" />
+      <stop offset="100%" stop-color="#FBBF24" />
+    </linearGradient>
+
+    <linearGradient id="badge-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#082315" />
+      <stop offset="100%" stop-color="#154B2F" />
+    </linearGradient>
+  </defs>
+
+  <!-- Left Icon Emblem Badge -->
+  <g transform="translate(10, 10)">
+    <rect x="0" y="0" width="140" height="140" rx="36" fill="url(#badge-bg)" stroke="rgba(255,255,255,0.14)" stroke-width="2" />
+    
+    <g transform="translate(-10, -10) scale(0.3125)">
+      <!-- Arc -->
+      <path d="M 148 368 C 205 408 307 408 364 368" fill="none" stroke="url(#full-arc)" stroke-width="8" stroke-linecap="round" />
+      <!-- Left Leaf -->
+      <path d="M 148 365 C 130 295 125 210 168 152 C 192 120 226 138 238 172 C 252 210 250 262 254 300 C 224 286 194 256 182 218 C 166 262 168 316 182 355 C 170 360 158 363 148 365 Z" fill="url(#full-leaf-l)" />
+      <!-- Right Leaf -->
+      <path d="M 364 365 C 382 295 387 210 344 152 C 320 120 286 138 274 172 C 260 210 262 262 258 300 C 288 286 318 256 330 218 C 346 262 344 316 330 355 C 342 360 354 363 364 365 Z" fill="url(#full-leaf-r)" />
+      <!-- Sprout -->
+      <path d="M 256 316 C 240 274 242 225 256 182 C 270 225 272 274 256 316 Z" fill="url(#full-sun)" />
+      <!-- Sun Node -->
+      <g transform="translate(256, 136)">
+        <circle cx="0" cy="0" r="28" fill="none" stroke="#FDE047" stroke-width="3" opacity="0.6" stroke-dasharray="7 5" />
+        <circle cx="0" cy="0" r="19" fill="url(#full-sun)" />
+        <circle cx="0" cy="0" r="8" fill="#FFFFFF" />
+      </g>
+      <!-- Nodes -->
+      <circle cx="148" cy="365" r="11" fill="#10B981" stroke="#082315" stroke-width="3" />
+      <circle cx="364" cy="365" r="11" fill="#F59E0B" stroke="#082315" stroke-width="3" />
+      <circle cx="256" cy="396" r="8.5" fill="#FDE047" stroke="#082315" stroke-width="2.5" />
+    </g>
+  </g>
+
+  <!-- Typography: MandiConnect -->
+  <text x="175" y="86" font-family="'Fraunces', 'Georgia', 'Inter', serif" font-size="52" font-weight="900" letter-spacing="-1">
+    <tspan fill="#0D2818">Mandi</tspan><tspan fill="#E67E22">Connect</tspan>
+  </text>
+  
+  <!-- Subtitle: Wholesale Produce Portal -->
+  <text x="178" y="118" font-family="'Inter', sans-serif" font-size="14" font-weight="700" fill="#166534" letter-spacing="4">
+    WHOLESALE PRODUCE PORTAL
+  </text>
+</svg>
+

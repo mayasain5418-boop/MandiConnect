@@ -56,11 +56,13 @@ export default function Register() {
             setLoading(true);
             const res = await sendOtp(email);
             if (res.success) {
+                setOtpCode('');
                 setStep('otp');
+                setResendTimer(30);
                 showToast(res.message || '6-digit OTP code sent to your Gmail inbox!', 'success');
             }
         } catch (error) {
-            showToast('Failed to send OTP email. Please check your email address.', 'error');
+            showToast(error.response?.data?.message || 'Failed to send OTP email. Please check your email address.', 'error');
         } finally {
             setLoading(false);
         }
@@ -99,6 +101,7 @@ export default function Register() {
             });
 
             if (res.success) {
+                setOtpCode('');
                 setStep('otp');
                 showToast(res.message || 'OTP code sent to your Gmail inbox!', 'success');
             }
@@ -124,6 +127,7 @@ export default function Register() {
                 navigate('/');
             }
         } catch (error) {
+            setOtpCode('');
             showToast(error.response?.data?.message || 'Invalid OTP verification code. Please check your Gmail.', 'error');
         } finally {
             setLoading(false);
@@ -136,11 +140,12 @@ export default function Register() {
             setLoading(true);
             const res = await resendOtp(email);
             if (res.success) {
+                setOtpCode('');
                 setResendTimer(30);
                 showToast(`Fresh 6-digit OTP code sent to ${email}`, 'success');
             }
         } catch (error) {
-            showToast('Failed to resend OTP email.', 'error');
+            showToast(error.response?.data?.message || 'Failed to resend OTP email.', 'error');
         } finally {
             setLoading(false);
         }
@@ -352,6 +357,8 @@ export default function Register() {
                                     value={otpCode}
                                     onChange={e => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                                     placeholder="• • • • • •"
+                                    inputMode="numeric"
+                                    autoComplete="one-time-code"
                                     maxLength={6}
                                     required
                                     className="w-full text-center text-2xl font-black font-mono py-3 tracking-widest bg-[#F8FAF7] border-2 border-[#164E33] rounded-2xl focus:outline-none focus:ring-4 focus:ring-emerald-100 text-[#0D2818]"
@@ -371,7 +378,10 @@ export default function Register() {
                         <div className="flex items-center justify-between text-xs text-gray-500 pt-2 border-t border-gray-100">
                             <button
                                 type="button"
-                                onClick={() => setStep('form')}
+                                onClick={() => {
+                                    setOtpCode('');
+                                    setStep('form');
+                                }}
                                 className="text-gray-500 hover:text-[#0D2818] font-bold"
                             >
                                 ← Edit Email Form

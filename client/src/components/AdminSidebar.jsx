@@ -17,6 +17,7 @@ import {
     FileText
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import MandiLogo from './common/MandiLogo';
 
 export default function AdminSidebar() {
     const location = useLocation();
@@ -42,9 +43,7 @@ export default function AdminSidebar() {
             <div>
                 {/* Brand Header */}
                 <div className="flex items-center gap-3 px-3 py-4 border-b border-emerald-900/60 mb-6">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#D9760C] to-[#B25F06] flex items-center justify-center text-white font-bold shadow-md">
-                        <Leaf className="w-5 h-5 text-amber-100" />
-                    </div>
+                    <MandiLogo variant="badge" size="md" className="shadow-md" />
                     <div>
                         <h2 className="text-base font-bold text-white font-serif tracking-tight leading-none">
                             Mandi<span className="text-[#D9760C]">Admin</span>
